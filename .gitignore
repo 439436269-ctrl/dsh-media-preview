@@ -1,0 +1,4 @@
+node_modules/
+*.tgz
+scripts/shots/
+scripts/fixtures/
