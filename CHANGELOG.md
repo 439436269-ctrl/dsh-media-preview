@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2 — 2026-10-17
+
+Playback speed and looping.
+
+- A **倍速 / Speed** button cycles 1× → 1.25× → 1.5× → 1.75× → 2× → 0.5× → 0.75× and shows the rate in force. The rate is re-applied after a source change (a new `src` resets `playbackRate`).
+- A **循环 / Loop** button toggles `loop`, with an active state on the button.
+- Both controls appear for audio as well as video, and the choice is remembered per browser in `localStorage` (`dsh-media-preview:playback`); a blocked store silently falls back to in-memory state.
+
 ## 0.1.1 — 2026-10-16
 
 Fit the video to the pane instead of letting it overflow.

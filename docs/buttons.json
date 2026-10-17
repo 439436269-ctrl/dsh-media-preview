@@ -1,0 +1,392 @@
+[
+  {
+    "index": 0,
+    "label": "",
+    "aria": "新建会话",
+    "title": "",
+    "box": {
+      "x": 16,
+      "y": 24,
+      "width": 216,
+      "height": 24
+    }
+  },
+  {
+    "index": 1,
+    "label": "",
+    "aria": "收起侧边栏",
+    "title": "",
+    "box": {
+      "x": 240,
+      "y": 22,
+      "width": 28,
+      "height": 28
+    }
+  },
+  {
+    "index": 2,
+    "label": "新会话 Ctrl + Alt + N",
+    "aria": "新建会话",
+    "title": "",
+    "box": {
+      "x": 14,
+      "y": 70,
+      "width": 252,
+      "height": 38
+    }
+  },
+  {
+    "index": 3,
+    "label": "插件",
+    "aria": "插件",
+    "title": "",
+    "box": {
+      "x": 14,
+      "y": 120,
+      "width": 252,
+      "height": 36
+    }
+  },
+  {
+    "index": 4,
+    "label": "上下文洞察",
+    "aria": "上下文洞察",
+    "title": "",
+    "box": {
+      "x": 14,
+      "y": 160,
+      "width": 252,
+      "height": 36
+    }
+  },
+  {
+    "index": 5,
+    "label": "",
+    "aria": "搜索会话",
+    "title": "",
+    "box": {
+      "x": 176,
+      "y": 210,
+      "width": 28,
+      "height": 28
+    }
+  },
+  {
+    "index": 6,
+    "label": "",
+    "aria": "视图选项",
+    "title": "",
+    "box": {
+      "x": 208,
+      "y": 210,
+      "width": 28,
+      "height": 28
+    }
+  },
+  {
+    "index": 7,
+    "label": "",
+    "aria": "添加工作区",
+    "title": "",
+    "box": {
+      "x": 240,
+      "y": 210,
+      "width": 28,
+      "height": 28
+    }
+  },
+  {
+    "index": 8,
+    "label": "",
+    "aria": "搜索置顶会话",
+    "title": "搜索置顶会话",
+    "box": {
+      "x": 244,
+      "y": 255,
+      "width": 16,
+      "height": 16
+    }
+  },
+  {
+    "index": 9,
+    "label": "",
+    "aria": "工作区“codes”的操作",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 10,
+    "label": "",
+    "aria": "在“codes”中新建会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 11,
+    "label": "",
+    "aria": "会话“知乎找问题编故事回答”的操作",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 12,
+    "label": "",
+    "aria": "归档会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 13,
+    "label": "",
+    "aria": "置顶会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 14,
+    "label": "",
+    "aria": "会话“二次元张力图片方案”的操作",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 15,
+    "label": "",
+    "aria": "归档会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 16,
+    "label": "",
+    "aria": "置顶会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 17,
+    "label": "",
+    "aria": "会话“检查极空间视频备份情况”的操作",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 18,
+    "label": "",
+    "aria": "归档会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 19,
+    "label": "",
+    "aria": "置顶会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 20,
+    "label": "",
+    "aria": "会话“增加 dsh 插件预览视频”的操作",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 21,
+    "label": "",
+    "aria": "归档会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 22,
+    "label": "",
+    "aria": "置顶会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 23,
+    "label": "",
+    "aria": "会话“极空间 dsh 多端访问”的操作",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 24,
+    "label": "",
+    "aria": "归档会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 25,
+    "label": "",
+    "aria": "置顶会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 26,
+    "label": "展开其余 7 个会话",
+    "aria": "",
+    "title": "",
+    "box": {
+      "x": 12,
+      "y": 553,
+      "width": 256,
+      "height": 28
+    }
+  },
+  {
+    "index": 27,
+    "label": "",
+    "aria": "在“未分组”中新建会话",
+    "title": "",
+    "box": null
+  },
+  {
+    "index": 28,
+    "label": "设置",
+    "aria": "设置",
+    "title": "",
+    "box": {
+      "x": 10,
+      "y": 848,
+      "width": 260,
+      "height": 42
+    }
+  },
+  {
+    "index": 29,
+    "label": "",
+    "aria": "打开右侧边栏",
+    "title": "",
+    "box": {
+      "x": 1560,
+      "y": 11,
+      "width": 28,
+      "height": 28
+    }
+  },
+  {
+    "index": 30,
+    "label": "codes",
+    "aria": "选择工作区",
+    "title": "",
+    "box": {
+      "x": 502.09375,
+      "y": 407,
+      "width": 86.234375,
+      "height": 28
+    }
+  },
+  {
+    "index": 31,
+    "label": "标准模式",
+    "aria": "",
+    "title": "选择新任务使用的 Agent 预设",
+    "box": {
+      "x": 592.328125,
+      "y": 407,
+      "width": 106,
+      "height": 28
+    }
+  },
+  {
+    "index": 32,
+    "label": "",
+    "aria": "添加文件或调用指令",
+    "title": "",
+    "box": {
+      "x": 506.09375,
+      "y": 520,
+      "width": 28,
+      "height": 28
+    }
+  },
+  {
+    "index": 33,
+    "label": "完全权限",
+    "aria": "访问模式，当前：完全权限",
+    "title": "",
+    "box": {
+      "x": 546.09375,
+      "y": 520,
+      "width": 100,
+      "height": 28
+    }
+  },
+  {
+    "index": 34,
+    "label": "DeepSeek-V41-Flash High",
+    "aria": "选择模型，当前 DeepSeek-V41-Flash，推理等级 High",
+    "title": "DeepSeek-V41-Flash · High",
+    "box": {
+      "x": 1128.703125,
+      "y": 520,
+      "width": 180.1875,
+      "height": 28
+    }
+  },
+  {
+    "index": 35,
+    "label": "",
+    "aria": "发送消息",
+    "title": "",
+    "box": {
+      "x": 1332.890625,
+      "y": 515,
+      "width": 34,
+      "height": 34
+    }
+  },
+  {
+    "index": 36,
+    "label": "",
+    "aria": "新标签页",
+    "title": "",
+    "box": {
+      "x": 1614,
+      "y": 10,
+      "width": 28,
+      "height": 28
+    }
+  },
+  {
+    "index": 37,
+    "label": "",
+    "aria": "分栏",
+    "title": "",
+    "box": {
+      "x": 2214,
+      "y": 10,
+      "width": 28,
+      "height": 28
+    }
+  },
+  {
+    "index": 38,
+    "label": "",
+    "aria": "全屏",
+    "title": "",
+    "box": {
+      "x": 2250,
+      "y": 10,
+      "width": 28,
+      "height": 28
+    }
+  },
+  {
+    "index": 39,
+    "label": "",
+    "aria": "收起右侧边栏",
+    "title": "",
+    "box": {
+      "x": 2286,
+      "y": 10,
+      "width": 28,
+      "height": 28
+    }
+  }
+]

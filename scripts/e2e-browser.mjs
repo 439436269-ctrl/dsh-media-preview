@@ -150,19 +150,32 @@ const videoName = video.split(/[\\/]/).pop();
 const directory = video.slice(0, video.length - videoName.length).replace(/[\\/]+$/, "");
 const segments = directory.split(/[\\/]/).filter(Boolean).slice(1); // drop the drive root ("D:")
 for (const segment of segments) {
-  const row = page.getByText(segment, { exact: true }).first();
-  if (await row.count()) {
+  let opened = false;
+  for (let attempt = 1; attempt <= 4 && !opened; attempt += 1) {
+    const row = page.getByText(segment, { exact: true }).first();
+    if ((await row.count()) === 0) {
+      await page.waitForTimeout(900);
+      continue;
+    }
     await row.click({ timeout: 5000 }).catch(() => {});
     await page.waitForTimeout(1500);
-  } else {
-    console.log(`tree segment not found: ${segment}`);
+    opened = true;
   }
+  if (!opened) console.log(`tree segment not found: ${segment}`);
 }
 await page.screenshot({ path: `${outDir}/04-video-tree.png` });
-const videoRow = page.getByText(videoName, { exact: true }).first();
+let videoRow = page.getByText(videoName, { exact: true }).first();
+// The tree is virtualized: scroll the pane until the row materializes.
+await page.mouse.move(1200, 700);
+for (let attempt = 0; attempt < 12 && (await videoRow.count()) === 0; attempt += 1) {
+  await page.mouse.wheel(0, 420);
+  await page.waitForTimeout(320);
+}
 if (await videoRow.count()) {
   await videoRow.click({ timeout: 5000 }).catch(() => {});
-  await page.waitForTimeout(4500);
+  await page.waitForTimeout(5000);
+  const pathText = await page.locator("body").innerText();
+  await writeFile(`${outDir}/tree.txt`, pathText, "utf8");
 } else {
   console.log(`video row not found: ${videoName}`);
   const treeText = await page.locator("body").innerText();
@@ -172,7 +185,11 @@ await page.screenshot({ path: `${outDir}/05-video-preview.png` });
 
 const media = page.locator("[data-media-preview-player]");
 const mediaCount = await media.count();
-console.log(`media elements: ${mediaCount}`);
+console.log(`media elements: ${mediaCount} previewRoots: ${await page.locator("[data-media-preview]").count()}`);
+if (mediaCount === 0) {
+  const postText = await page.locator("body").innerText();
+  console.log(`post body tail: ${postText.replace(/\s+/g, " ").slice(-420)}`);
+}
 if (mediaCount > 0) {
   const info = await media.first().evaluate((element) => ({
     tag: element.tagName,
@@ -205,6 +222,22 @@ if (mediaCount > 0) {
     };
   });
   console.log(`fit: ${JSON.stringify(fit)}`);
+  // Speed and loop controls: click each and read the media element back.
+  const speedButton = page.locator('[data-media-action="speed"]').first();
+  const loopButton = page.locator('[data-media-action="loop"]').first();
+  console.log(`controls: speed=${await speedButton.count()} loop=${await loopButton.count()}`);
+  if ((await speedButton.count()) > 0) {
+    await speedButton.click();
+    await page.waitForTimeout(300);
+    const speed = await media.first().evaluate((element) => element.playbackRate);
+    console.log(`speed: label=${(await speedButton.innerText()).trim()} playbackRate=${speed}`);
+  }
+  if ((await loopButton.count()) > 0) {
+    await loopButton.click();
+    await page.waitForTimeout(200);
+    const loopy = await media.first().evaluate((element) => element.loop);
+    console.log(`loop: element=${loopy} data-active=${await loopButton.getAttribute("data-active")}`);
+  }
   // Seek proves the range route serves arbitrary windows.
   const seek = await media.first().evaluate(async (element) => {
     const target = Number.isFinite(element.duration) ? Math.min(2, element.duration / 2) : 0;

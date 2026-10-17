@@ -24,7 +24,7 @@ dsh plugin --profile <profile> add dsh-media-preview
 ## 它做了什么
 
 - **渲染器** — 注册两个文档预览实现：`dsh-media-preview/media`（视频后缀）与 `dsh-media-preview/audio`（音频后缀），优先级 `extension`，`loading: 'renderer'`，后缀同时声明为二进制，因此不再提供「纯文本」兜底。
-- **播放器** — 原生 `<video>` / `<audio>` 元素，带浏览器自带控件。视频用 `object-fit: contain` 装进自适应框里，竖屏、横屏都一屏完整显示（多出来的是黑边），不会撑出预览区；另提供 **全屏** 与 **画中画** 按钮。音频显示文件卡片（文件名、大小、播放器）。body 会把 `loaded` / `failed` 回报给预览所有者，标签页的加载态才能收尾。
+- **播放器** — 原生 `<video>` / `<audio>` 元素，带浏览器自带控件。视频用 `object-fit: contain` 装进自适应框里，竖屏、横屏都一屏完整显示（多出来的是黑边），不会撑出预览区；下方有 **倍速**（1× → 1.25× → 1.5× → 1.75× → 2× → 0.5× → 0.75× 循环切换）、**循环**，视频另有 **全屏** 与 **画中画**。倍速/循环对音频同样生效，并按浏览器记住选择。音频显示文件卡片（文件名、大小、播放器）。body 会把 `loaded` / `failed` 回报给预览所有者，标签页的加载态才能收尾。
 - **流式路由** — Host 端 `GET|HEAD /api/media-preview?path=<绝对路径>`：`200` + `Accept-Ranges: bytes`；`206` + `Content-Range`（单窗口）；`416` + `Content-Range: bytes */size`；`HEAD` 只回头。实现上每次通过 `ctx.fs.readByteRange` 读一块（`chunkBytes`，默认 1 MiB），内存占用恒定。
 - **鉴权** — 路由挂在 `/api/` 下，连接服务的 Host/Origin 防护与浏览器会话 cookie 校验在进入 handler 之前执行，跨站页面无法借它读本地文件。
 

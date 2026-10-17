@@ -1,8 +1,25 @@
-# Verification record — dsh-media-preview 0.1.1
+# Verification record — dsh-media-preview 0.1.2
 
 DSH Desktop 0.2.0-rc.2, Windows 11, Node 24.22.0 / pnpm 11.7.0.
 
-Published coordinates: npm `dsh-media-preview` (latest: 0.1.1; 0.1.0 was the first release), repository `github.com/439436269-ctrl/dsh-media-preview`.
+Published coordinates: npm `dsh-media-preview` (latest: 0.1.2), repository `github.com/439436269-ctrl/dsh-media-preview`.
+
+## 0.1.2 — speed and loop
+
+Two buttons were added below the player: a speed button cycling 1× → 1.25× → 1.5× → 1.75× → 2× → 0.5× → 0.75×, and a loop toggle with an active state. The choice is stored in `localStorage` under `dsh-media-preview:playback` and re-applied after a source change (a new `src` resets `playbackRate`). Verified in the same headless flow:
+
+```
+media info: {"tag":"VIDEO","kind":"video","duration":5,"readyState":4,"error":null}
+fit: {"pane":{"width":719,"height":824},"player":{"width":695,"height":755},"contained":true,"fullyVisible":true}
+controls: speed=1 loop=1
+speed: label=1.25× playbackRate=1.25
+loop: element=true data-active=true
+seek: {"target":2,"currentTime":2,"readyState":4}
+play: {"currentTime":3.88,"paused":false,"readyState":4}
+errors: 0
+```
+
+Unit tests cover the cycle helpers (`nextSpeed`, `formatSpeed`); 34 tests pass in total.
 
 ## 0.1.1 — video fits the pane
 

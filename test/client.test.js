@@ -51,6 +51,22 @@ test("streamUrl encodes the path and keeps one query", async () => {
   );
 });
 
+test("speed cycles through the steps and wraps", async () => {
+  const { nextSpeed } = await loadBundle();
+  assert.equal(nextSpeed(1), 1.25);
+  assert.equal(nextSpeed(1.25), 1.5);
+  assert.equal(nextSpeed(2), 0.5);
+  assert.equal(nextSpeed(0.75), 1, "the last step wraps to normal speed");
+  assert.equal(nextSpeed(3), 1, "an unknown rate starts from the first step");
+});
+
+test("formatSpeed labels the button", async () => {
+  const { formatSpeed } = await loadBundle();
+  assert.equal(formatSpeed(1), "1×");
+  assert.equal(formatSpeed(1.5), "1.5×");
+  assert.equal(formatSpeed(0.75), "0.75×");
+});
+
 test("apply registers two renderers, two bodies, and one dictionary", async () => {
   const { apply } = await loadBundle();
   globalThis.__DSH_MEDIA_PREVIEW_CONFIG__ = { routePath: "/api/custom-media" };
