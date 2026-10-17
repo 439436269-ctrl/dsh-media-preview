@@ -1,8 +1,21 @@
-# Verification record — dsh-media-preview 0.1.0
+# Verification record — dsh-media-preview 0.1.1
 
 DSH Desktop 0.2.0-rc.2, Windows 11, Node 24.22.0 / pnpm 11.7.0.
 
-Published coordinates: npm `dsh-media-preview@0.1.0` (dist-tags.latest = 0.1.0, integrity `sha512-NHnHV/lcir+JfwqU/QqXheHXQmUdOoWSHFVUILWfwGQBBlj5V/nMUhdf9Z9Np0W3OZ9h8TSyfH37JFA2JyD30A==`), repository `github.com/439436269-ctrl/dsh-media-preview`, remote `main` commit `88973b9`.
+Published coordinates: npm `dsh-media-preview` (latest: 0.1.1; 0.1.0 was the first release), repository `github.com/439436269-ctrl/dsh-media-preview`.
+
+## 0.1.1 — video fits the pane
+
+A 720x1280 portrait clip used to render at the pane's full width and spill past the bottom edge. The body now wraps the player in a flexible `.dsh-mp-box` and the video uses `width/height: 100%` plus `object-fit: contain`, so the frame is fully visible at once with black letterboxing and the native controls reachable. Re-verified with the same headless flow:
+
+```
+fit: {"pane":{"width":719,"height":824},"player":{"width":695,"height":755},"contained":true,"fullyVisible":true}
+seek: {"target":2,"currentTime":2,"readyState":4}   # window served by the Range route
+play: {"currentTime":3.50,"paused":false,"readyState":4}
+errors: 0
+```
+
+`contained: true` is the regression guard added to `scripts/e2e-browser.mjs`: it compares the player's bounding box with the preview root's.
 
 ## L1 — unit tests
 

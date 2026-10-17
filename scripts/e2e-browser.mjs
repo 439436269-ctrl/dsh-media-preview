@@ -186,6 +186,25 @@ if (mediaCount > 0) {
     error: element.error ? { code: element.error.code, message: element.error.message } : null,
   }));
   console.log(`media info: ${JSON.stringify(info)}`);
+  // The whole frame must sit inside the preview pane: a portrait clip used to
+  // overflow the bottom edge before the flexible frame was introduced.
+  const fit = await media.first().evaluate((element) => {
+    const pane = element.closest("[data-media-preview]");
+    if (pane === null) return null;
+    const paneBox = pane.getBoundingClientRect();
+    const box = element.getBoundingClientRect();
+    return {
+      pane: { width: Math.round(paneBox.width), height: Math.round(paneBox.height) },
+      player: { width: Math.round(box.width), height: Math.round(box.height) },
+      contained:
+        box.top >= paneBox.top - 1 &&
+        box.bottom <= paneBox.bottom + 1 &&
+        box.left >= paneBox.left - 1 &&
+        box.right <= paneBox.right + 1,
+      fullyVisible: document.elementFromPoint(box.left + box.width / 2, box.top + 1) !== null,
+    };
+  });
+  console.log(`fit: ${JSON.stringify(fit)}`);
   // Seek proves the range route serves arbitrary windows.
   const seek = await media.first().evaluate(async (element) => {
     const target = Number.isFinite(element.duration) ? Math.min(2, element.duration / 2) : 0;

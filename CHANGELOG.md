@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 — 2026-10-16
+
+Fit the video to the pane instead of letting it overflow.
+
+- A portrait clip used to render at the pane's full width and spill past the bottom edge (`width: 100%` plus an aspect-derived height). The player now sits in a flexible frame that fills the pane and the video uses `object-fit: contain`, so the whole frame is visible at once with the native controls reachable.
+- The frame keeps a black letterbox and a rounded border; the loading/error hint sits under it instead of over the picture.
+
 ## 0.1.0 — 2026-10-16
 
 First release.
