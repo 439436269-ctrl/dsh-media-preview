@@ -39,9 +39,10 @@ function stubFs(options = {}) {
  * Register the route against a stub host and return the fetch face.
  * @param fs - stub filesystem.
  * @param overrides - config overrides.
+ * @param hooks - route hooks (`describeLoopback`).
  * @returns the fetch function the guest would call.
  */
-function mount(fs, overrides = {}) {
+function mount(fs, overrides = {}, hooks = {}) {
   let route;
   const ctx = {
     fs,
@@ -55,7 +56,7 @@ function mount(fs, overrides = {}) {
     },
   };
   const config = resolveConfig({ chunkBytes: 64 * 1024, ...overrides });
-  registerMediaRoute(ctx, config);
+  registerMediaRoute(ctx, config, hooks);
   assert.ok(route, "the route was registered");
   assert.deepEqual(route.methods, ["GET", "HEAD"]);
   assert.equal(route.path, "/api/media-preview");
@@ -169,6 +170,25 @@ test("files above the configured cap are refused", async () => {
 test("a disabled plugin answers 503", async () => {
   const fetch = mount(stubFs(), { enabled: false });
   assert.equal((await fetch(request())).status, 503);
+});
+
+test("discovery reports the loopback capability without touching the filesystem", async () => {
+  const fs = stubFs();
+  const fetch = mount(fs, {}, { describeLoopback: () => ({ origin: "http://127.0.0.1:51234", token: "cap" }) });
+  const response = await fetch(new Request("http://x/api/media-preview?discover=1"));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await response.json(), {
+    loopback: { origin: "http://127.0.0.1:51234", token: "cap" },
+  });
+  assert.equal(fs.reads.length, 0);
+});
+
+test("discovery answers null when no loopback origin is running", async () => {
+  const fetch = mount(stubFs());
+  const response = await fetch(new Request("http://x/api/media-preview?discover=1"));
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { loopback: null });
 });
 
 /** Convenience for the failure cases. */

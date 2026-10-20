@@ -82,9 +82,8 @@ test("apply registers the route and publishes the configured path to the page", 
         },
       },
       effect: (factory, label) => {
-        effects.push(label);
         const cleanup = factory();
-        if (typeof cleanup === "function") effects.push(cleanup);
+        effects.push({ label, cleanup: typeof cleanup === "function" ? cleanup : undefined });
       },
       on: (event, listener) => {
         assert.equal(event, "webserver/index-inject");
@@ -95,21 +94,28 @@ test("apply registers the route and publishes the configured path to the page", 
     assert.equal(route.path, "/api/custom-media");
     assert.equal(route.requestBody, "buffered");
     assert.deepEqual(route.methods, ["GET", "HEAD"]);
-    assert.ok(effects.includes("media-preview: stream route"));
+    assert.ok(effects.some((entry) => entry.label === "media-preview: stream route"));
+    assert.ok(effects.some((entry) => entry.label === "media-preview: loopback stream"));
 
     for (const handler of handlers) handler(injected);
     assert.equal(injected.length, 1);
     assert.equal(injected[0].kind, "global");
     assert.equal(injected[0].name, "__DSH_MEDIA_PREVIEW_CONFIG__");
-    assert.deepEqual(injected[0].value, { routePath: "/api/custom-media" });
+    assert.deepEqual(injected[0].value, { routePath: "/api/custom-media", loopback: true });
 
     // The mounted route still answers.
     const response = await route.fetch(new Request("http://x/api/custom-media?path=/tmp/a.mp4"));
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("content-type"), "video/mp4");
 
-    const cleanup = effects.find((entry) => typeof entry === "function");
-    cleanup();
+    // Discovery reports nothing until the loopback listener is up; either
+    // answer is valid JSON with a null-or-object `loopback`.
+    const discovered = await route.fetch(new Request("http://x/api/custom-media?discover=1"));
+    assert.equal(discovered.status, 200);
+    const body = await discovered.json();
+    assert.ok(body.loopback === null || typeof body.loopback === "object");
+
+    for (const entry of effects) await entry.cleanup?.();
     assert.equal(disposed, 1);
   } finally {
     await rm(root, { recursive: true, force: true });

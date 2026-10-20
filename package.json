@@ -1,7 +1,7 @@
 {
   "name": "dsh-media-preview",
-  "version": "0.1.2",
-  "description": "Video and audio preview for DeepSeek Harness: play mp4/mov/mkv/webm and mp3/flac/wav in the right-Sidebar document preview, streamed over an authenticated HTTP Range route so seeking works without loading the whole file.",
+  "version": "0.1.3",
+  "description": "Video and audio preview for DeepSeek Harness: play mp4/mov/mkv/webm and mp3/flac/wav in the right-Sidebar document preview, streamed over an authenticated HTTP Range route (plus a loopback origin so the desktop app can seek) without loading the whole file.",
   "type": "module",
   "license": "MIT",
   "author": "439436269-ctrl",

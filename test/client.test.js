@@ -51,6 +51,24 @@ test("streamUrl encodes the path and keeps one query", async () => {
   );
 });
 
+test("loopbackStreamUrl points at the token-guarded 127.0.0.1 origin", async () => {
+  const { loopbackStreamUrl } = await loadBundle();
+  assert.equal(
+    loopbackStreamUrl("http://127.0.0.1:51234", "abc_DEF-123", "D:\\codes\\a b\\clip#1.mp4"),
+    "http://127.0.0.1:51234/media/abc_DEF-123?path=D%3A%5Ccodes%5Ca%20b%5Cclip%231.mp4"
+  );
+});
+
+test("desktopOwned is true only when the shell owns the Host", async () => {
+  const { desktopOwned } = await loadBundle();
+  assert.equal(desktopOwned(), false);
+  globalThis.__DSH_TRANSPORT__ = { ownsHost: true, streamBaseUrl: "http://127.0.0.1:58146" };
+  assert.equal(desktopOwned(), true);
+  globalThis.__DSH_TRANSPORT__ = { ownsHost: false };
+  assert.equal(desktopOwned(), false);
+  delete globalThis.__DSH_TRANSPORT__;
+});
+
 test("speed cycles through the steps and wraps", async () => {
   const { nextSpeed } = await loadBundle();
   assert.equal(nextSpeed(1), 1.25);
@@ -133,6 +151,7 @@ test("apply registers two renderers, two bodies, and one dictionary", async () =
     assert.equal(slot.locale, "mediaPreview");
     const injected = slot.inject("session-1", {});
     assert.equal(injected.routePath, "/api/custom-media");
+    assert.equal(injected.loopback, true);
     assert.equal(typeof injected.t, "function");
   }
   assert.ok(effects.length >= 3);
@@ -158,5 +177,7 @@ test("apply works without any injected boot config", async () => {
     },
   };
   apply(ctx);
-  assert.equal(slots[0].inject("s", {}).routePath, "/api/media-preview");
+  const injected = slots[0].inject("s", {});
+  assert.equal(injected.routePath, "/api/media-preview");
+  assert.equal(injected.loopback, false, "an unknown Host advertises no loopback");
 });

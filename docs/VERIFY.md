@@ -1,8 +1,38 @@
-# Verification record — dsh-media-preview 0.1.2
+# Verification record — dsh-media-preview 0.1.3
 
-DSH Desktop 0.2.0-rc.2, Windows 11, Node 24.22.0 / pnpm 11.7.0.
+DSH Desktop 0.2.1-rc.2 (Electron 44.7.0), Windows 11, Node 24.21.0 / pnpm 11.28.5.
 
-Published coordinates: npm `dsh-media-preview` (latest: 0.1.2), repository `github.com/439436269-ctrl/dsh-media-preview`.
+Published coordinates: npm `dsh-media-preview` (latest: 0.1.3), repository `github.com/439436269-ctrl/dsh-media-preview`.
+
+## 0.1.3 — seeking inside the desktop shell
+
+**The bug.** In the desktop app the player played but dragging the native timeline snapped back to the start of the file (`0:02 / 1:32` no matter where the thumb was released).
+
+**Where it is not.** The route and the component are fine: in a browser page served over `http://127.0.0.1`, the same plugin opened the same 22,831,103-byte, 92.16 s MP4 in the right Sidebar and a real mouse drag moved `currentTime` from 4.45 s to 78.15 s with the element stable (`sameElement: true`, no remounts). Range traffic was one `bytes=0-` → `206 bytes 0-22831102/22831103`.
+
+**Root cause.** The desktop shell loads the page from `dsh-app://app` and proxies every other path through `protocol.handle` (`lib/main.js` of the desktop build: `forwardWebRequest`), which also strips `content-length` from the forwarded response. Chromium's media stack cannot seek a response produced by a custom-protocol handler: `video.seekable` collapses to `[0, 0]`. This is an Electron limitation, not a header problem — reports [electron#38749](https://github.com/electron/electron/issues/38749) and [electron#51442](https://github.com/electron/electron/issues/51442) show the same result with a hand-built `206` + `Content-Range` + `Accept-Ranges` handler. The renderer cannot dodge it by calling the Host origin directly either: the shell keeps the Host cookie to itself and injects it only on forwarded requests.
+
+**Fix.** `lib/loopback.js` — the Host also listens on an ephemeral `127.0.0.1` port, token-guarded in the path, Range-aware, reading through `ctx.fs`. `GET /api/media-preview?discover=1` returns `{ loopback: { origin, token } }`; the browser half uses that origin only when `globalThis.__DSH_TRANSPORT__.ownsHost === true` (i.e. inside the shell), and falls back to the authenticated route on any media error.
+
+**What was verified here (web host, headless Edge):**
+
+```
+discover: {"status":200,"body":{"loopback":{"origin":"http://127.0.0.1:52198","token":"xq4e…"}}}
+loopback element: {"duration":92.16,"seekable":[[0,92.16]],"error":null}  seek 60 → 60 (readyState 4)
+loopback drag:   {"currentTime":79.994018,"paused":true,"error":null}
+plugin element (browser mode): currentSrc=/api/media-preview?path=…&v=5725, seekable [[0,92.16]]
+```
+
+The desktop branch was exercised by setting `globalThis.__DSH_TRANSPORT__ = { ownsHost: true }` in the same page before opening the file — that is the only thing `desktopOwned()` looks at, so the plugin took the loopback path with its own player:
+
+```
+plugin element (desktop branch): currentSrc=http://127.0.0.1:52198/media/xq4e…?path=…, seekable [[0,92.16]]
+plugin drag:                     {"currentTime":72.764472,"paused":false}
+```
+
+Unit tests: `node --test test/*.test.js` → **47 pass**, including the new `test/loopback.test.js` (whole file, `206` window, open-ended, `HEAD` without reads, `416`, token refusal, method/path refusals, per-server tokens) and two `?discover=1` cases.
+
+**What was not verified here:** the desktop window itself cannot be launched from this session (Electron's browser process aborts in the tool sandbox), so the `dsh-app://` → `http://127.0.0.1` cross-origin media load is verified by construction and by the fallback, not by an observed desktop seek. If the shell blocks the loopback, the player degrades to the 0.1.2 behaviour instead of breaking.
 
 ## 0.1.2 — speed and loop
 

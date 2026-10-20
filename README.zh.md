@@ -26,7 +26,8 @@ dsh plugin --profile <profile> add dsh-media-preview
 - **渲染器** — 注册两个文档预览实现：`dsh-media-preview/media`（视频后缀）与 `dsh-media-preview/audio`（音频后缀），优先级 `extension`，`loading: 'renderer'`，后缀同时声明为二进制，因此不再提供「纯文本」兜底。
 - **播放器** — 原生 `<video>` / `<audio>` 元素，带浏览器自带控件。视频用 `object-fit: contain` 装进自适应框里，竖屏、横屏都一屏完整显示（多出来的是黑边），不会撑出预览区；下方有 **倍速**（1× → 1.25× → 1.5× → 1.75× → 2× → 0.5× → 0.75× 循环切换）、**循环**，视频另有 **全屏** 与 **画中画**。倍速/循环对音频同样生效，并按浏览器记住选择。音频显示文件卡片（文件名、大小、播放器）。body 会把 `loaded` / `failed` 回报给预览所有者，标签页的加载态才能收尾。
 - **流式路由** — Host 端 `GET|HEAD /api/media-preview?path=<绝对路径>`：`200` + `Accept-Ranges: bytes`；`206` + `Content-Range`（单窗口）；`416` + `Content-Range: bytes */size`；`HEAD` 只回头。实现上每次通过 `ctx.fs.readByteRange` 读一块（`chunkBytes`，默认 1 MiB），内存占用恒定。
-- **鉴权** — 路由挂在 `/api/` 下，连接服务的 Host/Origin 防护与浏览器会话 cookie 校验在进入 handler 之前执行，跨站页面无法借它读本地文件。
+- **桌面端拖动进度** — 桌面端页面来自 `dsh-app://app`，其余请求都经 `protocol.handle` 代理。Chromium 的媒体栈**无法对自定义协议处理器产生的响应做 seek**（`video.seekable` 直接退化成 `[0, 0]`），所以在桌面端会出现「能播、但一拖进度就弹回开头」。因此 Host 另开一个 127.0.0.1 的临时端口，并通过 `GET /api/media-preview?discover=1` 把带一次性能力令牌的地址交给浏览器半：在桌面外壳里播放器直接连这个回环源，走真正的 HTTP `Range`，拖动即可定位。普通浏览器里仍用原来的鉴权路由。
+- **鉴权** — 路由挂在 `/api/` 下，连接服务的 Host/Origin 防护与浏览器会话 cookie 校验在进入 handler 之前执行，跨站页面无法借它读本地文件。回环监听只绑 `127.0.0.1`，且每个请求必须带上本次启动随机生成的令牌（在路径里），否则只回一个 `404`；字节仍经组合后的 `fs` provider 读取，文件系统策略与 `/api` 路由完全一致。
 
 ## 配置
 
@@ -36,6 +37,7 @@ dsh plugin --profile <profile> add dsh-media-preview
 |---|---|---|
 | `enabled` | `true` | 是否挂载路由。关掉后渲染器仍在，但不传字节（`503`）。 |
 | `routePath` | `/api/media-preview` | 路由路径。必须以 `/api/` 开头，否则回退到默认值，保证鉴权防线不失效。 |
+| `loopback` | `true` | 是否同时开一个带令牌的 `127.0.0.1` 回环源。**桌面端能拖进度靠的就是它**；关掉后只剩鉴权路由，桌面端能播但不能 seek。 |
 | `maxBytes` | `2147483648`（2 GiB） | 允许流式传输的最大文件，更大的回 `413`。 |
 | `chunkBytes` | `1048576` | 每次范围读的字节数。 |
 | `videoExtensions` | `mp4, m4v, mov, webm, ogv, ogg, mkv, avi, wmv, flv, 3gp, ts, m2ts, mts` | 视频播放器接管的后缀。 |
@@ -50,14 +52,15 @@ dsh plugin --profile <profile> add dsh-media-preview
 ## 结构
 
 ```
-lib/index.js    Host 入口：name / inject / Config / apply（路由 + 索引注入）
+lib/index.js    Host 入口：name / inject / Config / apply（路由 + 回环源 + 索引注入）
 lib/config.js   默认值与归一化，不 import 宿主包（可单测）
 lib/schema.js   schemastery Config，供 loader 与设置页
 lib/range.js    HTTP Range 解析，纯函数
 lib/mime.js     后缀 → media type
 lib/route.js    带鉴权的流式 handler（fetch 形状、分块）
+lib/loopback.js 带能力令牌的 127.0.0.1 媒体源（node:http，支持 Range）
 lib/client.js   浏览器 bundle：渲染器、body、样式、文案
-test/           node --test：range、config、route、适配层挂载、客户端 bundle
+test/           node --test：range、config、route、回环源、适配层挂载、客户端 bundle
 scripts/        无头浏览器 E2E 与 HTTP 探针
 ```
 
@@ -82,6 +85,7 @@ node scripts/e2e-browser.mjs --base http://127.0.0.1:<port> --token <token> --vi
 - 一次只处理一个字节窗口；多窗口 `Range` 头回 `416`（浏览器对媒体元素只会要一个窗口）。
 - `.mkv`、`.avi`、`.wmv`、`.flv` 会被接管并列出，但 Chromium 解不了，插件显示播放器的错误态而不是假装能播。
 - 没有自建播放列表、字幕轨、倍速控件——这些交给原生控件。
+- 若部署环境封了回环端口（防火墙 / 策略），播放器会自动退回鉴权路由：文件照样能播，但桌面端又回到「拖不动」的状态。这是 Electron 的已知限制（[electron#38749](https://github.com/electron/electron/issues/38749)、[electron#51442](https://github.com/electron/electron/issues/51442)），不是路由能解决的。
 
 ## 许可
 

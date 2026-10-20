@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.3 — 2026-10-20
+
+Seeking in the desktop app, via a loopback media origin.
+
+- **Desktop timeline seeking.** The desktop shell serves the page from `dsh-app://app` and proxies every request through `protocol.handle`; Chromium cannot seek a media response produced by a custom-protocol handler (it reports `video.seekable` as `[0, 0]`), so dragging the native timeline snapped back to the start of the file. The Host now also listens on an ephemeral `127.0.0.1` port (the new `loopback` setting, on by default) and publishes the capability token through `GET /api/media-preview?discover=1`; inside the shell the player streams from that origin over real HTTP `Range`.
+- The loopback listener binds `127.0.0.1` only, every request must carry the per-boot token in its path (otherwise a bare `404`), and bytes still come from the composed `fs` provider, so the deployment's filesystem policy is unchanged.
+- A blocked or refused loopback origin falls back to the authenticated route automatically: playback degrades to the old (non-seekable) behaviour instead of failing.
+- Browsers are untouched: `dsh web` keeps using `/api/media-preview`, with the same `206` windows as before.
+
 ## 0.1.2 — 2026-10-17
 
 Playback speed and looping.
