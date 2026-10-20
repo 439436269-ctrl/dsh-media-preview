@@ -80,6 +80,12 @@ node scripts/e2e-browser.mjs --base http://127.0.0.1:<port> --token <token> --vi
 
 `E2E_BROWSER_CHANNEL=msedge` makes Playwright use the system Edge when the bundled Chromium is unavailable.
 
+Seeking has its own check, including the desktop transport shape:
+
+```sh
+node scripts/e2e-seek.mjs --base http://127.0.0.1:<port> --token <token> --video "<absolute path to a video>" --simulate-desktop
+```
+
 ## Known limitations
 
 - One byte window per request; a multi-range `Range` header is answered `416`. Browsers only ever ask a media element for one window.

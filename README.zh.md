@@ -80,6 +80,12 @@ node scripts/e2e-browser.mjs --base http://127.0.0.1:<port> --token <token> --vi
 
 本机 Chromium 版本不匹配时用 `E2E_BROWSER_CHANNEL=msedge` 走系统 Edge。
 
+拖动进度另有专项检查（含桌面端传输形态）：
+
+```sh
+node scripts/e2e-seek.mjs --base http://127.0.0.1:<port> --token <token> --video "<视频绝对路径>" --simulate-desktop
+```
+
 ## 已知限制
 
 - 一次只处理一个字节窗口；多窗口 `Range` 头回 `416`（浏览器对媒体元素只会要一个窗口）。
