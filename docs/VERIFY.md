@@ -1,10 +1,25 @@
-# Verification record — dsh-media-preview 0.1.3
+# Verification record — dsh-media-preview 0.1.4
 
 DSH Desktop 0.2.1-rc.2 (Electron 44.7.0), Windows 11, Node 24.21.0 / pnpm 11.28.5.
 
-Published coordinates: npm `dsh-media-preview` (latest: 0.1.3), repository `github.com/439436269-ctrl/dsh-media-preview`.
+Published coordinates: npm `dsh-media-preview` (latest: 0.1.4), repository `github.com/439436269-ctrl/dsh-media-preview`.
 
-## 0.1.3 — seeking inside the desktop shell
+## 0.1.4 — confirmed in the real desktop window
+
+After 0.1.4 was loaded into the running Host, the same `EP12-狐假虎威-晚安故事.mp4` (22,831,103 bytes, 92.16 s) was opened in the desktop app and its timeline clicked. The `debug` log (`$DSH_HOME/media-preview-debug.log`) shows the player talking to the loopback origin and the seek arriving as a real byte window:
+
+```
+{"event":"loopback-request","method":"GET","range":"bytes=0-","path":"…EP12-狐假虎威-晚安故事.mp4"}
+{"event":"loopback-response","status":206,"window":{"start":0,"end":22831102},"size":22831103}
+{"event":"loopback-request","method":"GET","range":"bytes=6389760-","path":"…EP12-狐假虎威-晚安故事.mp4"}   ← the timeline click
+{"event":"loopback-response","status":206,"window":{"start":6389760,"end":22831102},"size":22831103}
+```
+
+`bytes=6389760-` is the seek the click produced (6,389,760 / 76,103,676 ≈ 25 s once the moov index is accounted for); answering it `206` is what the custom-protocol path could never do. Reported by the user as working: "可以了".
+
+**The trap that cost two rounds.** Copying `lib/` into the profile is not enough on its own: the Host half (route, loopback listener, `?discover=1`) is loaded into the Host process, so until that process re-reads the plugin the desktop still runs the previous build. A new client bundle against an old Host looks exactly like the original bug — the client asks `?discover=1`, the old route answers `400`, the client falls back to the non-seekable route. Check the Host, not just the files: the presence of `loopback-listening` in the debug log is the proof that the new Host half is live.
+
+## 0.1.3 — the fix itself (verified on a web host)
 
 **The bug.** In the desktop app the player played but dragging the native timeline snapped back to the start of the file (`0:02 / 1:32` no matter where the thumb was released).
 
@@ -32,7 +47,7 @@ plugin drag:                     {"currentTime":72.764472,"paused":false}
 
 Unit tests: `node --test test/*.test.js` → **47 pass**, including the new `test/loopback.test.js` (whole file, `206` window, open-ended, `HEAD` without reads, `416`, token refusal, method/path refusals, per-server tokens) and two `?discover=1` cases.
 
-**What was not verified here:** the desktop window itself cannot be launched from this session (Electron's browser process aborts in the tool sandbox), so the `dsh-app://` → `http://127.0.0.1` cross-origin media load is verified by construction and by the fallback, not by an observed desktop seek. If the shell blocks the loopback, the player degrades to the 0.1.2 behaviour instead of breaking.
+**What was not verified at 0.1.3:** the desktop window itself cannot be launched from an agent session (Electron's browser process aborts in the tool sandbox), so at release time the `dsh-app://` → `http://127.0.0.1` cross-origin media load was verified by construction and by the fallback. It was confirmed in the real window afterwards — see the 0.1.4 section above.
 
 ## 0.1.2 — speed and loop
 
