@@ -19,6 +19,8 @@ After 0.1.4 was loaded into the running Host, the same `EP12-狐假虎威-晚安
 
 **The trap that cost two rounds.** Copying `lib/` into the profile is not enough on its own: the Host half (route, loopback listener, `?discover=1`) is loaded into the Host process, so until that process re-reads the plugin the desktop still runs the previous build. A new client bundle against an old Host looks exactly like the original bug — the client asks `?discover=1`, the old route answers `400`, the client falls back to the non-seekable route. Check the Host, not just the files: the presence of `loopback-listening` in the debug log is the proof that the new Host half is live.
 
+**No application restart is required.** The Host re-reads the plugin on its own (plugin/host reload), so quitting the desktop app is not part of the procedure — confirmed on the fixing run: the Electron main process kept the PID it had held for days and the loopback listener still came up. What must be current is the *Host half*, and that is what the reload touches; the client bundle follows the page it is served with.
+
 ## 0.1.3 — the fix itself (verified on a web host)
 
 **The bug.** In the desktop app the player played but dragging the native timeline snapped back to the start of the file (`0:02 / 1:32` no matter where the thumb was released).
