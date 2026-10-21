@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4 — 2026-10-21
+
+Diagnostics for playback problems, and a stricter fallback.
+
+- New **`debug`** setting (off by default). When on, the Host appends one JSON line per event to `$DSH_HOME/media-preview-debug.log`: every request the loopback origin answered (method, `Range`, status, window, size) and every report the player posts to `GET <routePath>?diag=1` (which origin it chose, `seekable` ranges, `seeking` / `seeked` / `error` / `stalled` / `playing` events, and a one-shot reachability probe of the loopback origin). The renderer console of the desktop shell is unreachable from outside, so this is the only way to see what a player inside it actually does.
+- The loopback fallback is now **stricter**: an error after metadata has arrived no longer switches to the non-seekable authenticated route, because that switch silently traded a seekable player for a non-seekable one. Only a loopback origin that never produced metadata falls back.
+
 ## 0.1.3 — 2026-10-20
 
 Seeking in the desktop app, via a loopback media origin.

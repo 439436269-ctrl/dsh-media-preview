@@ -101,7 +101,7 @@ test("apply registers the route and publishes the configured path to the page", 
     assert.equal(injected.length, 1);
     assert.equal(injected[0].kind, "global");
     assert.equal(injected[0].name, "__DSH_MEDIA_PREVIEW_CONFIG__");
-    assert.deepEqual(injected[0].value, { routePath: "/api/custom-media", loopback: true });
+    assert.deepEqual(injected[0].value, { routePath: "/api/custom-media", loopback: true, debug: false });
 
     // The mounted route still answers.
     const response = await route.fetch(new Request("http://x/api/custom-media?path=/tmp/a.mp4"));

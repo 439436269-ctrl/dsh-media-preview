@@ -152,6 +152,7 @@ test("apply registers two renderers, two bodies, and one dictionary", async () =
     const injected = slot.inject("session-1", {});
     assert.equal(injected.routePath, "/api/custom-media");
     assert.equal(injected.loopback, true);
+    assert.equal(injected.debug, false);
     assert.equal(typeof injected.t, "function");
   }
   assert.ok(effects.length >= 3);

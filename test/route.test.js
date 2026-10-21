@@ -191,6 +191,24 @@ test("discovery answers null when no loopback origin is running", async () => {
   assert.deepEqual(await response.json(), { loopback: null });
 });
 
+test("diagnostic reports are decoded, logged and acknowledged", async () => {
+  const logged = [];
+  const fetch = mount(stubFs(), {}, { log: (event, data) => logged.push({ event, data }) });
+  const payload = { phase: "seeked", base: "loopback", currentTime: 12.5 };
+  const data = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const response = await fetch(new Request(`http://x/api/media-preview?diag=1&data=${data}`));
+  assert.equal(response.status, 204);
+  assert.equal(logged.length, 1);
+  assert.equal(logged[0].event, "client");
+  assert.deepEqual(logged[0].data, payload);
+});
+
+test("an unreadable diagnostic report is refused", async () => {
+  const fetch = mount(stubFs(), {}, { log: () => assert.fail("nothing to log") });
+  assert.equal((await fetch(new Request("http://x/api/media-preview?diag=1&data=%7Bbad"))).status, 400);
+  assert.equal((await fetch(new Request("http://x/api/media-preview?diag=1"))).status, 400);
+});
+
 /** Convenience for the failure cases. */
 function request() {
   return new Request("http://x/api/media-preview?path=/tmp/a.mp4");

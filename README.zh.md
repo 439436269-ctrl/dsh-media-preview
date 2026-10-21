@@ -38,6 +38,7 @@ dsh plugin --profile <profile> add dsh-media-preview
 | `enabled` | `true` | 是否挂载路由。关掉后渲染器仍在，但不传字节（`503`）。 |
 | `routePath` | `/api/media-preview` | 路由路径。必须以 `/api/` 开头，否则回退到默认值，保证鉴权防线不失效。 |
 | `loopback` | `true` | 是否同时开一个带令牌的 `127.0.0.1` 回环源。**桌面端能拖进度靠的就是它**；关掉后只剩鉴权路由，桌面端能播但不能 seek。 |
+| `debug` | `false` | 把播放器与回环源的诊断事件逐行写进 `$DSH_HOME/media-preview-debug.log`。只有排查播放问题时才需要打开。 |
 | `maxBytes` | `2147483648`（2 GiB） | 允许流式传输的最大文件，更大的回 `413`。 |
 | `chunkBytes` | `1048576` | 每次范围读的字节数。 |
 | `videoExtensions` | `mp4, m4v, mov, webm, ogv, ogg, mkv, avi, wmv, flv, 3gp, ts, m2ts, mts` | 视频播放器接管的后缀。 |

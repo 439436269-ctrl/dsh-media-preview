@@ -38,6 +38,7 @@ Settings live on the `media-preview` entry (Settings → Plugins, or the profile
 | `enabled` | `true` | Mount the route at all. _Off_ leaves the renderer registered but transfers no bytes (`503`). |
 | `routePath` | `/api/media-preview` | Route pathname. Must start with `/api/`; anything else falls back to the default so the auth fence still applies. |
 | `loopback` | `true` | Also serve bytes from the token-guarded `127.0.0.1` origin. This is what makes the desktop player seekable. _Off_ keeps only the authenticated route: the desktop shell can play but not seek. |
+| `debug` | `false` | Append playback/loopback diagnostics to `$DSH_HOME/media-preview-debug.log`. Leave off unless you are diagnosing a problem. |
 | `maxBytes` | `2147483648` (2 GiB) | Largest file served; larger files answer `413`. |
 | `chunkBytes` | `1048576` | Bytes per ranged read. |
 | `videoExtensions` | `mp4, m4v, mov, webm, ogv, ogg, mkv, avi, wmv, flv, 3gp, ts, m2ts, mts` | Suffixes the video player claims. |
