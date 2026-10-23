@@ -1,3 +1,5 @@
+> **Renamed:** the canonical package is now [`dsh-preview-media`](https://github.com/439436269-ctrl/dsh-preview-media). This repository is kept as the legacy 0.1.x home.
+
 # dsh-media-preview
 
 Video and audio preview for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness): play `mp4`, `mov`, `mkv`, `webm` and `mp3`, `flac`, `wav` right inside the right-Sidebar document preview instead of the built-in “this format cannot be previewed” empty state.
